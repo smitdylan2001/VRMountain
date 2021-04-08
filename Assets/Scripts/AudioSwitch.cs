@@ -18,19 +18,21 @@ public class AudioSwitch : MonoBehaviour
     [SerializeField] AudioSource[] audioSources;
 
 	float startSize;
+	Quaternion startRotation;
 
 	int counter = 0;
 
 	private void Start()
 	{
 		startSize = gameObject.transform.localScale.y;
+		startRotation = gameObject.transform.rotation;
 	}
 
 	private void OnTriggerEnter(Collider other)
 	{
 		if (other.CompareTag("AudioSwitch"))
 		{
-			StartCoroutine(SwitchAudio(other.gameObject)); ;
+			StartCoroutine(SwitchAudio(other.gameObject));
 		}
 	}
 
@@ -39,6 +41,8 @@ public class AudioSwitch : MonoBehaviour
 		while(gameObject.transform.localScale.x < 100)
 		{
 			gameObject.transform.localScale *= (1 + Time.deltaTime) * 1.1f;
+			//TODO: Rotate
+			gameObject.transform.Rotate(new Vector3(Time.deltaTime, Time.deltaTime, Time.deltaTime));
 			yield return null;
 		}
 
@@ -46,7 +50,7 @@ public class AudioSwitch : MonoBehaviour
 		{
 			foreach(AudioSource aus in audioSources)
 			{
-				aus.volume -= Time.deltaTime;
+				aus.volume -= Time.deltaTime*2	;
 			}
 			yield return null;
 		}
@@ -55,12 +59,15 @@ public class AudioSwitch : MonoBehaviour
 			aus.volume =0;
 		}
 
-		yield return new WaitForSeconds(1f);
 		
-		for (int i=0; i>audioSources.Length; i++)
+		for (int i=0; i<audioSources.Length; i++)
 		{
-			audioSources[i].clip = audios[counter].audioclips[i];
+			audioSources[i].Stop();
+			audioSources[i].clip = audios[counter].audioclips[i%audios[counter].audioclips.Length];
+			audioSources[i].Play();
 		}
+
+		gameObject.transform.rotation = startRotation;
 
 		while (audioSources[0].volume < 0.98f)
 		{
