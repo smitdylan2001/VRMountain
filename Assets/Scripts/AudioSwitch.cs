@@ -69,7 +69,7 @@ public class AudioSwitch : MonoBehaviour
 
 		gameObject.transform.rotation = startRotation;
 
-		while (audioSources[0].volume < 0.98f)
+		while (audioSources[0].volume < 0.79f)
 		{
 			foreach (AudioSource aus in audioSources)
 			{
